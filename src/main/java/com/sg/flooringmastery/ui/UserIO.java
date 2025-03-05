@@ -1,6 +1,7 @@
 package com.sg.flooringmastery.ui;
 
 public interface UserIO {
+
     void print(String msg);
 
     double readDouble(String prompt);
