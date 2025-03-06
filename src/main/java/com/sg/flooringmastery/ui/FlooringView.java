@@ -91,11 +91,8 @@ public class FlooringView {
 
     public void displayOrders(List<Order> orders) {
         for (Order o : orders) {
-            io.print(String.format("Order #%d: %s, %s, %s, etc.",
-                    o.getOrderNumber()));
-                   // o.getCustomerName(),
-                    //o.getProductType(),
-                    //o.getTotal()));
+
+            System.out.println(o);
         }
     }
 

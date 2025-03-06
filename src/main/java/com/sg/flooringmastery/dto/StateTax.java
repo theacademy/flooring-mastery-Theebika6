@@ -13,5 +13,23 @@ public class StateTax {
         this.stateAbbreviation = stateAbbreviation;
         this.taxRate = taxRate;
     }
+    public String getStateName(){
+    return stateName;
+    }
+
+    public String getStateAbbreviation(){
+        return stateAbbreviation;
+    }
+
+    public BigDecimal getTaxRate(){
+        return taxRate;
+    }
+
+    public String toString(){
+        return "tbd";
+    }
+
+
+
 
 }

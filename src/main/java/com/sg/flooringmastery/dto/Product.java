@@ -27,7 +27,7 @@ public class Product {
     //to String
     @Override
     public String toString(){
-        return "Product {" + "productType=" + productType + "costPerSqft" + costPerSqft + "laborCostPerSqft" + laborCostPerSqft ;
+        return "Product {" + " productType=" + productType + " costPerSqft " + costPerSqft + " laborCostPerSqft " + laborCostPerSqft ;
     }
 
 
