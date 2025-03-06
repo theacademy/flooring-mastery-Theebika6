@@ -1,16 +1,24 @@
 package com.sg.flooringmastery.controller;
 
+import com.sg.flooringmastery.dao.FlooringDataPersistenceException;
+import com.sg.flooringmastery.dto.Order;
+import com.sg.flooringmastery.service.FlooringServiceLayer;
 import com.sg.flooringmastery.ui.FlooringView;
 import com.sg.flooringmastery.ui.MenuSelection;
 import com.sg.flooringmastery.ui.UserIO;
 import com.sg.flooringmastery.ui.UserIOConsoleImpl;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public class FlooringController {
 
     private final FlooringView view;
+    private final FlooringServiceLayer service;
 
-    public FlooringController(FlooringView view) {
+    public FlooringController(FlooringView view, FlooringServiceLayer service) {
         this.view = view;
+        this.service= service;
     }
 
     public void run() {
@@ -51,7 +59,18 @@ public class FlooringController {
 
     private void displayOrders() {
         System.out.println("DISPLAY ORDERS ...");
+        //ask view for a date
+        LocalDate date= view.promptOrderDate();
+
+        try{
+            List<Order> orders = service.getAllOrders(date);
+            view.displayOrders(orders);
+        }catch (FlooringDataPersistenceException e){
+            view.displayHeader("Error " + e.getMessage());
+        }
+
         view.displayPressEnterToContinue();
+
     }
 
     private void addOrder() {

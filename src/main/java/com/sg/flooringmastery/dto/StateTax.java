@@ -13,4 +13,5 @@ public class StateTax {
         this.stateAbbreviation = stateAbbreviation;
         this.taxRate = taxRate;
     }
+
 }

@@ -5,13 +5,17 @@ import com.sg.flooringmastery.dto.Product;
 import com.sg.flooringmastery.dto.StateTax;
 
 import java.math.BigDecimal;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class FlooringView {
 
     private final UserIO io;
+    private final DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
     public FlooringView(UserIO io) {
         this.io = io;
@@ -29,8 +33,16 @@ public class FlooringView {
 
     // ask for order date
     public LocalDate promptOrderDate(){
-        String date = io.readString("Enter the order date (MM-DD-YYYY");
-        return LocalDate.parse(date);
+        while (true) {
+            String date = io.readString("Please enter the order date MMddyyyy");
+
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddyyyy");
+                return LocalDate.parse(date, formatter);
+            } catch (DateTimeException e) {
+                io.print("Invalid date format. Please try again");
+            }
+        }
     }
 
     //ask for order number
@@ -38,10 +50,10 @@ public class FlooringView {
         return io.readInt("Enter your order number");
     }
 
-    //prompt decimal value
-    //public BigDecimal promptBigDecimal() {
-      //  return io.readBigDecimal("Enter a decimal value: ");
-    //}
+    // prompt decimal value
+    public BigDecimal promptBigDecimal() {
+       return io.readBigDecimal("Enter a decimal value: ");
+    }
 
     //display add order
     public Order displayAddOrder(List<Product> products, List<StateTax> stateTaxes){
@@ -65,6 +77,28 @@ public class FlooringView {
         int choice= io.readInt("Please select from the above choices: ", 1, 6);
         return MenuSelection.fromInt(choice);
     }
+
+    public String displayExportAllData(){
+        displayHeader("Export All Data");
+        // ask user to confirm
+        boolean confirm = io.readBoolean("Are you sure you want to export all the data?");
+        if(confirm){
+            return "All data are exported sucessfully";
+        }else{
+            return "Export failed";
+        }
+    }
+
+    public void displayOrders(List<Order> orders) {
+        for (Order o : orders) {
+            io.print(String.format("Order #%d: %s, %s, %s, etc.",
+                    o.getOrderNumber()));
+                   // o.getCustomerName(),
+                    //o.getProductType(),
+                    //o.getTotal()));
+        }
+    }
+
 
 
 }

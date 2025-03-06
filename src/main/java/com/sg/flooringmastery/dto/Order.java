@@ -5,27 +5,27 @@ import java.time.LocalDate;
 
 public class Order {
 
-    private String orderNumber;
+    private int orderNumber;
     private LocalDate orderDate;
     private String customertName;
     private BigDecimal area;
 
     private StateTax stateTax;
-    private Order order;
+    private Product product;
 
-    public Order getOrder() {
-        return order;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
-    public String getOrderNumber() {
+    public int getOrderNumber() {
         return orderNumber;
     }
 
-    public void setOrderNumber(String orderNumber) {
+    public void setOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
     }
 
@@ -61,13 +61,4 @@ public class Order {
         this.stateTax = stateTax;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    private Product product;
 }

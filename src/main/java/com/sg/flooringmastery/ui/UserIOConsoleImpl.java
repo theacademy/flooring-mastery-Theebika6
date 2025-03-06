@@ -1,5 +1,7 @@
 package com.sg.flooringmastery.ui;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class UserIOConsoleImpl implements UserIO{
@@ -11,28 +13,24 @@ public class UserIOConsoleImpl implements UserIO{
     }
 
     @Override
-    public double readDouble(String prompt) {
-        return 0;
+    public boolean readBoolean(String prompt) {
+        print(prompt + "(true/false : ");
+        String input = sc.nextLine().trim().toLowerCase();
+        return input.equals("true") || input.equals("yes") || input.equals("y");
     }
 
-    @Override
-    public double readDouble(String prompt, double min, double max) {
-        return 0;
-    }
-
-    @Override
-    public float readFloat(String prompt) {
-        return 0;
-    }
-
-    @Override
-    public float readFloat(String prompt, float min, float max) {
-        return 0;
-    }
 
     @Override
     public int readInt(String prompt) {
-        return 0;
+        while(true){
+            print(prompt);
+            String input = sc.nextLine();
+            try{
+                return Integer.parseInt(input);
+            }catch (NumberFormatException e){
+                print("Invalid integer, please try again");
+            }
+        }
     }
 
     @Override
@@ -41,18 +39,43 @@ public class UserIOConsoleImpl implements UserIO{
         return Integer.parseInt(sc.nextLine());
     }
 
-    @Override
-    public long readLong(String prompt) {
-        return 0;
-    }
-
-    @Override
-    public long readLong(String prompt, long min, long max) {
-        return 0;
-    }
 
     @Override
     public String readString(String prompt) {
+        System.out.println(prompt);
+        return sc.nextLine();
+    }
+
+    @Override
+    public String readString(String prompt, int minChars, int maxChars) {
         return "";
+    }
+
+    @Override
+    public LocalDate readLocalDate(String prompt) {
+        return null;
+    }
+
+    @Override
+    public LocalDate readLocalDate(String prompt, LocalDate minDate) {
+        return null;
+    }
+
+    @Override
+    public BigDecimal readBigDecimal(String prompt) {
+        while(true){
+            print(prompt);
+            String input = sc.nextLine();
+            try{
+                return new BigDecimal(input);
+            }catch (NumberFormatException e){
+                print("Invalid decimal, please try again");
+            }
+        }
+    }
+
+    @Override
+    public BigDecimal readBigDecimal(String prompt, int scale, BigDecimal min) {
+        return null;
     }
 }

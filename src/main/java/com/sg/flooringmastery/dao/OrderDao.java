@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderDao {
-    List<Order> getAllOrders() throws FlooringDataPersistenceException;
 
     List<Order> getAllOrders( LocalDate orderDate) throws FlooringDataPersistenceException;
 
