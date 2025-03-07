@@ -52,7 +52,7 @@ public class FlooringView {
 
     // prompt decimal value
     public BigDecimal promptBigDecimal() {
-       return io.readBigDecimal("Enter a decimal value: ");
+        return io.readBigDecimal("Enter a decimal value: ");
     }
 
     //display add order
@@ -78,18 +78,17 @@ public class FlooringView {
         }
         //States --> it will loop and if user enters in lowercase it will change to uppercase to match
         io.print("Available states:");
-        io.print("Total states loaded " + stateTaxes.size()); //debugging
         for (StateTax tax : stateTaxes) {
             io.print(tax.getStateAbbreviation() + " - TaxRate: " + tax.getTaxRate());
         }
 
         StateTax selectedState = null;
         while (selectedState == null) {
-            String stateAbbreviation = io.readString("Enter state abbreviation: ").toUpperCase();
+            String stateAbbreviation = io.readString("Enter state: ").toUpperCase();
             System.out.println("User input state: " + stateAbbreviation); // Debugging
             for (StateTax tax : stateTaxes) {
-                System.out.println("Checking against state: [" + tax.getStateAbbreviation() + "]"); // Debugging
-                if (tax.getStateAbbreviation().trim().equalsIgnoreCase(stateAbbreviation)) {
+                if (tax.getStateAbbreviation().trim().equalsIgnoreCase(stateAbbreviation) ||
+                        tax.getStateName().trim().equalsIgnoreCase(stateAbbreviation)) {
                     selectedState = tax;
                     break;
                 }

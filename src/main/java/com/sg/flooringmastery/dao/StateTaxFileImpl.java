@@ -56,8 +56,6 @@ public class StateTaxFileImpl implements StateTaxDao {
 
             if (stateTaxObject != null) { // Only add valid entries
                 stateTax.put(stateTaxObject.getStateAbbreviation(), stateTaxObject);
-                //debug
-                System.out.println("Loaded state: " + stateTaxObject.getStateAbbreviation());
             }
         }
         scanner.close();
@@ -82,7 +80,6 @@ public class StateTaxFileImpl implements StateTaxDao {
             System.out.println("Skipping invalid tax rate: " + tokens[2]);
             return null;
         }
-        System.out.println("Loaded state abbreviation: [" + stateAbbreviation + "]"); // Debugging
         return new StateTax(stateAbbreviation, stateName, taxRate);
     }
 }

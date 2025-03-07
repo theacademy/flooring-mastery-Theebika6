@@ -1,9 +1,6 @@
 package com.sg.flooringmastery.service;
 
-import com.sg.flooringmastery.dao.FlooringDataPersistenceException;
-import com.sg.flooringmastery.dao.OrderDao;
-import com.sg.flooringmastery.dao.ProductDao;
-import com.sg.flooringmastery.dao.StateTaxDao;
+import com.sg.flooringmastery.dao.*;
 import com.sg.flooringmastery.dto.Order;
 import com.sg.flooringmastery.dto.Product;
 import com.sg.flooringmastery.dto.StateTax;
@@ -122,7 +119,7 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
     }
 
     @Override
-    public int getNextOrderNumber(LocalDate orderDate) throws FlooringDataPersistenceException {
+    public int getNextOrderNumber(LocalDate orderDate) throws FlooringDataPersistenceException, OrderNotFoundException {
         List<Order> ordersForDate = orderDao.getAllOrders(orderDate); // Get orders for the date
         return ordersForDate.stream().mapToInt(Order::getOrderNumber).max().orElse(0) + 1;
     }
@@ -139,4 +136,4 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
         return null;
     }
 
-    }
+}

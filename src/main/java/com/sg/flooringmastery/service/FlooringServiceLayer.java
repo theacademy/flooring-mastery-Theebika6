@@ -1,6 +1,7 @@
 package com.sg.flooringmastery.service;
 
 import com.sg.flooringmastery.dao.FlooringDataPersistenceException;
+import com.sg.flooringmastery.dao.OrderNotFoundException;
 import com.sg.flooringmastery.dto.Order;
 import com.sg.flooringmastery.dto.Product;
 import com.sg.flooringmastery.dto.StateTax;
@@ -30,5 +31,5 @@ public interface FlooringServiceLayer {
 
     Order removeOrder(LocalDate orderDate, int orderNumber);
 
-    int getNextOrderNumber(LocalDate orderDate) throws FlooringDataPersistenceException;
+    int getNextOrderNumber(LocalDate orderDate) throws FlooringDataPersistenceException, OrderNotFoundException;
 }

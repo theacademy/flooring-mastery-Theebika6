@@ -22,10 +22,14 @@ public class OrderDaoFileImpl implements OrderDao {
     public List<Order> getAllOrders(LocalDate orderDate) throws FlooringDataPersistenceException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddyyyy");
         String fileDate = orderDate.format(formatter);
-        String fileName = "Orders/Orders_" + fileDate + ".txt";
+        String fileName = ORDER_FOLDER + orderDate.format(DateTimeFormatter.ofPattern("MMddyyyy")) + ".txt";
         //create an arraylist
         List<Order> orderList = new ArrayList<>();
+        File orderFile = new File(fileName);
 
+        if(!orderFile.exists()){
+            return orderList;
+        }
         try{
             Scanner sc = new Scanner(new BufferedReader(new FileReader(fileName)));
             if (sc.hasNextLine()) {
@@ -34,7 +38,6 @@ public class OrderDaoFileImpl implements OrderDao {
             while(sc.hasNextLine()){
                 //Order order = new Order();
                 String line = sc.nextLine();
-                String[] split = line.split(DELIMITER);
                 Order order= unmarshalOrder(line, orderDate);
                 orderList.add(order);
             }
@@ -48,9 +51,43 @@ public class OrderDaoFileImpl implements OrderDao {
 
     @Override
     public Order addOrder(Order order) throws FlooringDataPersistenceException, OrderNotFoundException {
-        order.setOrderNumber(order.getOrderNumber());
+        LocalDate orderDate = order.getOrderDate();
+        String fileName = ORDER_FOLDER + orderDate.format(DateTimeFormatter.ofPattern("MMddyyyy")) + ".txt";
 
-        return null;
+        File orderFile = new File(fileName);
+
+        if (!orderFile.exists()) {
+            // Ask for user confirmation before creating the file
+            System.out.println("File " + orderFile.getName() + " does not exist. Do you want to create it? (yes/no)");
+            Scanner scanner = new Scanner(System.in);
+            String response = scanner.nextLine().trim().toLowerCase();
+
+            if (!response.equals("yes")) {
+                throw new FlooringDataPersistenceException("Order was not saved because the file was not created.");
+            }
+        }
+
+        // Retrieve existing orders for the given date
+        List<Order> ordersForDate;
+        try {
+            ordersForDate = getAllOrders(orderDate);
+        } catch (FlooringDataPersistenceException e) {
+            // If the file does not exist or cannot be read, assume it's empty
+            ordersForDate = new ArrayList<>();
+        }
+
+        // Assign the next order number
+        int nextOrderNumber = ordersForDate.stream().mapToInt(Order::getOrderNumber).max().orElse(0) + 1;
+        order.setOrderNumber(nextOrderNumber);
+
+        // Add the new order to the list
+        ordersForDate.add(order);
+
+
+        // Save orders to the file
+        writeOrdersToFile(orderDate, ordersForDate);
+
+        return order;
     }
 
     @Override
@@ -68,10 +105,9 @@ public class OrderDaoFileImpl implements OrderDao {
         return null;
     }
 
-    /*write order to file
+    //write order to file
     private void writeOrdersToFile(LocalDate date, List<Order> orderList) throws FlooringDataPersistenceException {
-        String fileName = ORDER_FOLDER + "Orders_"
-                + date.format(DateTimeFormatter.ofPattern("MMddyyyy")) + FILE_EXT;
+        String fileName = ORDER_FOLDER + date.format(DateTimeFormatter.ofPattern("MMddyyyy")) + ".txt";
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
             out.println("OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,"
                     + "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total");
@@ -79,10 +115,11 @@ public class OrderDaoFileImpl implements OrderDao {
             for (Order o : orderList) {
                 out.println(marshallOrder(o));
             }
+
         } catch (IOException e) {
             throw new FlooringDataPersistenceException("Could not write to file: " + fileName, e);
         }
-    }*/
+    }
 
     //unmarshall
     private Order unmarshalOrder(String line, LocalDate orderDate) {
