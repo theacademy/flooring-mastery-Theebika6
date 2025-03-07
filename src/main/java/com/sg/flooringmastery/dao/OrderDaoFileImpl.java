@@ -86,7 +86,7 @@ public class OrderDaoFileImpl implements OrderDao {
 
 
     @Override
-    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderDataValidationException {
+    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException {
         read(orderDate); // Load orders
 
         List<Order> ordersForDate = orders.get(orderDate);
@@ -113,7 +113,11 @@ public class OrderDaoFileImpl implements OrderDao {
         if (ordersForDate.isEmpty()) {
             // If all orders are removed, delete the file
             String fileName = ORDER_FOLDER + orderDate.format(DateTimeFormatter.ofPattern("MMddyyyy")) + ".txt";
-            new File(fileName).delete();
+            File file = new File(fileName);
+            if(file.exists()){
+                file.delete();
+            }
+            orders.remove(orderDate);
         } else {
             // Otherwise, rewrite the file
             writeOrdersToFile(orderDate, ordersForDate);

@@ -138,12 +138,20 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
         validateProduct(order.getProduct().getProductType());
         validateArea(order.getArea());
 
-        return orderDao.editOrder(order); // Pass `order` as an argument
+        return orderDao.editOrder(order);
     }
 
     @Override
-    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException{
-        return orderDao.removeOrder(orderDate, orderNumber);
+    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException {
+        return null;
     }
-
 }
+
+   /* @Override
+    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException{
+        Order orderToRemove = orderDao.getOrder(orderDate, orderNumber);
+        if(orderToRemove == null){
+            throw new OrderDataValidationException("Error: Order cannot be found!");
+    }
+    return orderDao.removeOrder(orderDate, orderNumber);*/
+//}

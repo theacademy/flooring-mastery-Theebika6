@@ -155,10 +155,15 @@ public class FlooringView {
         }
         String newState = io.readString("Enter new state (" + existingOrder.getStateTax().getStateAbbreviation() + ") or press Enter to keep: ");
         if (!newState.trim().isEmpty()) {
-            existingOrder.getStateTax().setStateAbbreviation(newState);
+            for(StateTax tax : stateTaxes){
+                if(tax.getStateAbbreviation().equalsIgnoreCase(newState) || tax.getStateName().equalsIgnoreCase(newState)){
+                    existingOrder.setStateTax(tax);
+                    break;
+                }
+            }
         }
 
-        // Allow editing of product type
+        // editing product type
         io.print("Available products:");
         for (Product product : products) {
             io.print(product.getProductType() + " - Cost per sq ft: " + product.getCostPerSqft() +
@@ -166,13 +171,30 @@ public class FlooringView {
         }
         String newProductType = io.readString("Enter new product type (" + existingOrder.getProduct().getProductType() + ") or press Enter to keep: ");
         if (!newProductType.trim().isEmpty()) {
-            existingOrder.getProduct().setProductType(newProductType);
+            for (Product product : products) {
+                if (product.getProductType().equalsIgnoreCase(newProductType)) {
+                    existingOrder.setProduct(product);
+                    break;
+                }
+            }
         }
 
-        // Allow editing of area
-        BigDecimal newArea = io.readBigDecimal("Enter new area (" + existingOrder.getArea() + ") or press Enter to keep: ");
-        if (newArea.compareTo(BigDecimal.ZERO) > 0) {
-            existingOrder.setArea(newArea);
+        // editing area
+        String newAreaInput = io.readString("Enter new area (" + existingOrder.getArea() + ") or press Enter to keep: ");
+        if (!newAreaInput.trim().isEmpty()) {
+            BigDecimal newArea = new BigDecimal(newAreaInput);
+            if (newArea.compareTo(BigDecimal.valueOf(100)) >= 0) {
+                existingOrder.setArea(newArea);
+            } else {
+                io.print("Invalid area. Must be at least 100 sq ft.");
+            }
+        }
+
+        // confirm to save
+        boolean saveChanges = io.readBoolean(("Do you want to save changes? (yes/no)"));
+        if(!saveChanges){
+            io.print("Editing failed.");
+            return null;
         }
 
         return existingOrder;

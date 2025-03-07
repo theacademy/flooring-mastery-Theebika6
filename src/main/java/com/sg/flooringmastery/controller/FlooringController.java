@@ -120,6 +120,10 @@ public class FlooringController {
             }
 
             Order updatedOrder = view.displayEditOrder(service.getProducts(), service.getStateTaxes(), existingOrder);
+            if(updatedOrder == null){
+                return ;
+            }
+
             service.editOrder(updatedOrder);
             view.displayHeader("Order updated successfully!");
 
@@ -129,7 +133,6 @@ public class FlooringController {
 
         view.displayPressEnterToContinue();
     }
-
 
     private void removeOrder() {
         view.displayRemoveOrderBanner();
@@ -146,6 +149,37 @@ public class FlooringController {
 
         view.displayPressEnterToContinue();
     }
+   /* private void removeOrder() {
+        view.displayRemoveOrderBanner();
+
+        LocalDate orderDate = view.promptOrderDate();
+        int orderNumber = view.promptOrderNumber();
+
+        try {
+            Order existingOrder = service.getOrder(orderDate, orderNumber);
+            if (existingOrder == null) {
+                view.displayHeader("Error: Order not found.");
+                return;
+            }
+
+            // Display order details before deletion
+            view.displayOrders(List.of(existingOrder));
+
+            boolean confirm = view.io.readBoolean("Are you sure you want to remove this order? (yes/no)");
+            if (!confirm) {
+                view.displayHeader("Order removal canceled.");
+                return;
+            }
+
+            Order removedOrder = service.removeOrder(orderDate, orderNumber);
+            view.displayRemoveResult(removedOrder);
+
+        } catch (FlooringDataPersistenceException | OrderDataValidationException e) {
+            view.displayHeader("Error: " + e.getMessage());
+        }
+
+        view.displayPressEnterToContinue();
+    } */
 
 
 }
