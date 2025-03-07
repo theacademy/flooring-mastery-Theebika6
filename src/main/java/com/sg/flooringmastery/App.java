@@ -1,31 +1,20 @@
 package com.sg.flooringmastery;
 
 import com.sg.flooringmastery.controller.FlooringController;
-import com.sg.flooringmastery.dao.*;
-import com.sg.flooringmastery.service.FlooringServiceImpl;
-import com.sg.flooringmastery.service.FlooringServiceLayer;
-import com.sg.flooringmastery.ui.FlooringView;
-import com.sg.flooringmastery.ui.UserIO;
-import com.sg.flooringmastery.ui.UserIOConsoleImpl;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class App {
     public static void main(String[] args) {
-        try {
-            UserIO io = new UserIOConsoleImpl();
-            FlooringView view = new FlooringView(io);
 
-            // Instantiate DAOs
-            OrderDao orderDao = new OrderDaoFileImpl();
-            ProductDao productDao = new ProductDaoFileImpl();  // May throw exception
-            StateTaxDao stateTaxDao = new StateTaxFileImpl(); // May throw exception
 
-            // Instantiate service and controller
-            FlooringServiceLayer service = new FlooringServiceImpl(orderDao, productDao, stateTaxDao);
-            FlooringController controller = new FlooringController(view, service);
-            controller.run();
+        ApplicationContext appContext
+                = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 
-        } catch (FlooringDataPersistenceException e) {
-            System.out.println("Error loading data: " + e.getMessage());
-        }
+        //get bean method  look inside the application context and get bean Controller
+        // it will look for beans who's id is controller
+        FlooringController controller = appContext.getBean("controller", FlooringController.class);
+        controller.run();
     }
+
 }

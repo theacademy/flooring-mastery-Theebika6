@@ -86,8 +86,10 @@ public class FlooringView {
         StateTax selectedState = null;
         while (selectedState == null) {
             String stateAbbreviation = io.readString("Enter state abbreviation: ").toUpperCase();
+            System.out.println("User input state: " + stateAbbreviation); // Debugging
             for (StateTax tax : stateTaxes) {
-                if (tax.getStateAbbreviation().equals(stateAbbreviation)) {
+                System.out.println("Checking against state: [" + tax.getStateAbbreviation() + "]"); // Debugging
+                if (tax.getStateAbbreviation().trim().equalsIgnoreCase(stateAbbreviation)) {
                     selectedState = tax;
                     break;
                 }

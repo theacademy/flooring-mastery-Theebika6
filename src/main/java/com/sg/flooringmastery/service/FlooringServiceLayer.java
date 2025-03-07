@@ -17,7 +17,7 @@ public interface FlooringServiceLayer {
     List<Product> getProducts();
 
     StateTax getStateTax(String stateAbbreviation)
-            throws OrderDataValidationException;  // e.g. if the state doesn't exist
+            throws OrderDataValidationException;  // if the state doesn't exist
 
     List<StateTax> getStateTaxes() throws FlooringDataPersistenceException;
 

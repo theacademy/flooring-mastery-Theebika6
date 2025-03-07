@@ -80,13 +80,21 @@ public class FlooringController {
         System.out.println("ADD ORDER");
 
         List<Product> products = service.getProducts();
-        List<StateTax> stateTaxes = service.getStateTaxes();
+        List<StateTax> stateTaxes;
+        try {
+            stateTaxes = service.getStateTaxes(); // Handle exception when retrieving states
+        } catch (FlooringDataPersistenceException e) {
+            view.displayHeader("Error loading state tax data: " + e.getMessage());
+            return;
+        }
         Order newOrder = view.displayAddOrder(products, stateTaxes);
 
         try {
-            int orderNumber = service.getNextOrderNumber(newOrder.getOrderDate()); // Get next order number
+            // Get next order number
+            int orderNumber = service.getNextOrderNumber(newOrder.getOrderDate());
             newOrder.setOrderNumber(orderNumber);
 
+            //Add order
             Order addedOrder = service.addOrder(newOrder);
             view.displayHeader("Order added successfully!");
             System.out.println(addedOrder);
