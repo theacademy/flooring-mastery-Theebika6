@@ -107,13 +107,45 @@ public class FlooringController {
 
 
     private void editOrder() {
-        System.out.println("EDIT ORDER ...");
+        System.out.println("EDIT ORDER");
+
+        LocalDate orderDate = view.promptOrderDate();
+        int orderNumber = view.promptOrderNumber();
+
+        try {
+            Order existingOrder = service.getOrder(orderDate, orderNumber);
+            if (existingOrder == null) {
+                view.displayHeader("Error: Order not found.");
+                return;
+            }
+
+            Order updatedOrder = view.displayEditOrder(service.getProducts(), service.getStateTaxes(), existingOrder);
+            service.editOrder(updatedOrder);
+            view.displayHeader("Order updated successfully!");
+
+        } catch (FlooringDataPersistenceException | OrderDataValidationException e) {
+            view.displayHeader("Error: " + e.getMessage());
+        }
+
         view.displayPressEnterToContinue();
     }
 
+
     private void removeOrder() {
-        System.out.println("REMOVE ORDER (stub)...");
+        view.displayRemoveOrderBanner();
+
+        LocalDate orderDate = view.promptOrderDate();
+        int orderNumber = view.promptOrderNumber();
+
+        try {
+            Order removedOrder = service.removeOrder(orderDate, orderNumber);
+            view.displayRemoveResult(removedOrder);
+        } catch (FlooringDataPersistenceException | OrderDataValidationException e) {
+            view.displayHeader("Error: " + e.getMessage());
+        }
+
         view.displayPressEnterToContinue();
     }
+
 
 }

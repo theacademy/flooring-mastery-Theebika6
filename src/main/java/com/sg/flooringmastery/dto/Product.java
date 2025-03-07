@@ -15,6 +15,9 @@ public class Product {
     public String getProductType(){
         return productType;
     }
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
 
     public BigDecimal getCostPerSqft() {
         return costPerSqft;

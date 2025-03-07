@@ -23,6 +23,11 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
     }
 
     @Override
+    public Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException {
+        return orderDao.getOrder(orderDate, orderNumber);
+    }
+
+    @Override
     public Product getProduct(String productType) throws OrderDataValidationException {
         return null;
     }
@@ -127,13 +132,18 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
 
 
     @Override
-    public Order editOrder(Order order) throws OrderDataValidationException {
-        return null;
+    public Order editOrder(Order order) throws FlooringDataPersistenceException, OrderDataValidationException {
+        validateCustomerName(order.getCustomerName());
+        validateState(order.getStateTax().getStateAbbreviation());
+        validateProduct(order.getProduct().getProductType());
+        validateArea(order.getArea());
+
+        return orderDao.editOrder(order); // Pass `order` as an argument
     }
 
     @Override
-    public Order removeOrder(LocalDate orderDate, int orderNumber) {
-        return null;
+    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException{
+        return orderDao.removeOrder(orderDate, orderNumber);
     }
 
 }

@@ -138,6 +138,60 @@ public class FlooringView {
         return new Order(0, orderDate, customerName, area, selectedState, selectedProduct);
     }
 
+    // edit Order
+    public Order displayEditOrder(List<Product> products, List<StateTax> stateTaxes, Order existingOrder){
+        displayHeader("Edit Order");
+
+        //editing name
+        String newCustomerName = io.readString("Enter new customer name (" + existingOrder.getCustomerName() + ")");
+        if(!newCustomerName.trim().isEmpty()){
+            existingOrder.setCustomerName(newCustomerName);
+        }
+        //editing state
+        // Allow editing of state
+        io.print("Available states:");
+        for (StateTax tax : stateTaxes) {
+            io.print(tax.getStateAbbreviation() + " - TaxRate: " + tax.getTaxRate());
+        }
+        String newState = io.readString("Enter new state (" + existingOrder.getStateTax().getStateAbbreviation() + ") or press Enter to keep: ");
+        if (!newState.trim().isEmpty()) {
+            existingOrder.getStateTax().setStateAbbreviation(newState);
+        }
+
+        // Allow editing of product type
+        io.print("Available products:");
+        for (Product product : products) {
+            io.print(product.getProductType() + " - Cost per sq ft: " + product.getCostPerSqft() +
+                    ", Labor cost per sq ft: " + product.getLaborCostPerSqft());
+        }
+        String newProductType = io.readString("Enter new product type (" + existingOrder.getProduct().getProductType() + ") or press Enter to keep: ");
+        if (!newProductType.trim().isEmpty()) {
+            existingOrder.getProduct().setProductType(newProductType);
+        }
+
+        // Allow editing of area
+        BigDecimal newArea = io.readBigDecimal("Enter new area (" + existingOrder.getArea() + ") or press Enter to keep: ");
+        if (newArea.compareTo(BigDecimal.ZERO) > 0) {
+            existingOrder.setArea(newArea);
+        }
+
+        return existingOrder;
+    }
+   // remove order
+   public void displayRemoveOrderBanner() {
+       io.print("=== Remove Order ===");
+   }
+
+    public void displayRemoveResult(Order removedOrder) {
+        if (removedOrder != null) {
+            io.print("Order successfully removed.");
+        } else {
+            io.print("No such order found.");
+        }
+        io.readString("Please hit enter to continue.");
+    }
+
+
     // display Menu
     public MenuSelection printMenuAndGet() {
         io.print("***************************************");

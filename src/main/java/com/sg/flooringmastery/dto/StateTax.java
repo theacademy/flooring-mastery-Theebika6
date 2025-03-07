@@ -21,6 +21,11 @@ public class StateTax {
         return stateAbbreviation;
     }
 
+    public void setStateAbbreviation(String stateAbbreviation) {
+        this.stateAbbreviation = stateAbbreviation;
+    }
+
+
     public BigDecimal getTaxRate(){
         return taxRate;
     }
