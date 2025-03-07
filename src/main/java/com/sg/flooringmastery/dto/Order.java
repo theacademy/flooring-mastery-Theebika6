@@ -11,11 +11,12 @@ public class Order {
     private LocalDate orderDate;
     private String customerName;
     private BigDecimal area;
-
     private StateTax stateTax;
     private Product product;
 
-    public Order(){}
+    public Order(){
+        orderNumber = -1;
+    }
 
     public Order(int orderNumber, LocalDate orderDate, String customerName, BigDecimal area, StateTax stateTax, Product product){
         this.orderNumber = orderNumber;
@@ -78,18 +79,14 @@ public class Order {
         if (product == null || area == null) {
             return BigDecimal.ZERO;
         }
-        return area
-                .multiply(product.getCostPerSqft())
-                .setScale(2, RoundingMode.HALF_UP);
+        return area.multiply(product.getCostPerSqft()).setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getLaborCost() {
         if (product == null || area == null) {
             return BigDecimal.ZERO;
         }
-        return area
-                .multiply(product.getLaborCostPerSqft())
-                .setScale(2, RoundingMode.HALF_UP);
+        return area.multiply(product.getLaborCostPerSqft()).setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getTax() {
@@ -98,16 +95,11 @@ public class Order {
         }
         // (MaterialCost + LaborCost) * (TaxRate / 100)
         BigDecimal subTotal = getMaterialCost().add(getLaborCost());
-        BigDecimal taxRateDecimal = stateTax.getTaxRate().divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP);
-        return subTotal
-                .multiply(taxRateDecimal)
-                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal taxRateDecimal = stateTax.getTaxRate().divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        return subTotal.multiply(taxRateDecimal).setScale(2, RoundingMode.HALF_UP);
     }
     public BigDecimal getTotal() {
-        return getMaterialCost()
-                .add(getLaborCost())
-                .add(getTax())
-                .setScale(2, RoundingMode.HALF_UP);
+        return getMaterialCost().add(getLaborCost()).add(getTax()).setScale(2, RoundingMode.HALF_UP);
     }
 
     // to String to format the data of how I want
@@ -116,14 +108,14 @@ public class Order {
         return "Order:" +
                 "orderNumber = " + orderNumber +
                 ", orderDate = " + orderDate +
-                ", customerName='" + customerName + '\'' +
-                ", area=" + area +
-                ", stateTax=" + (stateTax != null ? stateTax.getStateAbbreviation() : "null") +
+                ", customerName = " + customerName + '\'' +
+                ", area = " + area +
+                ", stateTax = " + (stateTax != null ? stateTax.getStateAbbreviation() : "null") +
                 ", product=" + (product != null ? product.getProductType() : "null") +
-                ", materialCost=" + getMaterialCost() +
-                ", laborCost=" + getLaborCost() +
-                ", tax=" + getTax() +
-                ", total=" + getTotal() ;
+                ", materialCost = " + getMaterialCost() +
+                ", laborCost = " + getLaborCost() +
+                ", tax = " + getTax() +
+                ", total = " + getTotal() ;
     }
 
     // equals
@@ -139,5 +131,9 @@ public class Order {
                 Objects.equals(stateTax, order.stateTax) &&
                 Objects.equals(product, order.product);
     }
+    //clone order
+    //public Order cloneOrder(){
+      //  return new Order()
+    //}
 
 }

@@ -4,10 +4,7 @@ import com.sg.flooringmastery.dto.Order;
 import com.sg.flooringmastery.dto.Product;
 import com.sg.flooringmastery.dto.StateTax;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.time.LocalDate;
@@ -16,7 +13,10 @@ import java.util.*;
 
 public class OrderDaoFileImpl implements OrderDao {
 
+    private static final String ORDER_FOLDER = "Orders/Orders_";
     public static final String DELIMITER = ",";
+    private Map<LocalDate, List<Order>> orders = new HashMap<>();
+
 
     @Override
     public List<Order> getAllOrders(LocalDate orderDate) throws FlooringDataPersistenceException {
@@ -47,7 +47,9 @@ public class OrderDaoFileImpl implements OrderDao {
 
 
     @Override
-    public Order addOrder(Order order) throws FlooringDataPersistenceException {
+    public Order addOrder(Order order) throws FlooringDataPersistenceException, OrderNotFoundException {
+        order.setOrderNumber(order.getOrderNumber());
+
         return null;
     }
 
@@ -65,6 +67,22 @@ public class OrderDaoFileImpl implements OrderDao {
     public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException {
         return null;
     }
+
+    /*write order to file
+    private void writeOrdersToFile(LocalDate date, List<Order> orderList) throws FlooringDataPersistenceException {
+        String fileName = ORDER_FOLDER + "Orders_"
+                + date.format(DateTimeFormatter.ofPattern("MMddyyyy")) + FILE_EXT;
+        try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
+            out.println("OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,"
+                    + "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total");
+
+            for (Order o : orderList) {
+                out.println(marshallOrder(o));
+            }
+        } catch (IOException e) {
+            throw new FlooringDataPersistenceException("Could not write to file: " + fileName, e);
+        }
+    }*/
 
     //unmarshall
     private Order unmarshalOrder(String line, LocalDate orderDate) {

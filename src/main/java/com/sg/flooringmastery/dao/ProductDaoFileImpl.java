@@ -2,36 +2,77 @@ package com.sg.flooringmastery.dao;
 
 import com.sg.flooringmastery.dto.Product;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class ProductDaoFileImpl implements ProductDao{
 
     private Map<String,Product> product = new HashMap<>();
     public static final String DELIMETER= ",";
-    private static final String PRODUCT_FILE = "/Data/Products.txt";
+    private static final String PRODUCT_FILE = "Data/Products.txt";
 
     public ProductDaoFileImpl() throws FlooringDataPersistenceException {
             try{
                 loadProduct();
-            } catch (IOException e) {
+            } catch (FlooringDataPersistenceException e) {
                 throw new FlooringDataPersistenceException("Could not load product file");
             }
 
     }
 
-    public void loadProduct() throws IOException{
-    }
-
     @Override
     public List<Product> getAllProducts() {
-        return List.of();
+        return new ArrayList<>(product.values());
     }
 
     @Override
-    public Product getAllProduct(String productType) {
-        return null;
+    public Product getProduct(String productType) {
+        return product.get(productType);
     }
+
+
+    public void loadProduct() throws FlooringDataPersistenceException{
+        Scanner scanner;
+
+        try{
+            scanner = new Scanner(new BufferedReader(new FileReader(PRODUCT_FILE)));
+        } catch (FileNotFoundException e){
+            throw new FlooringDataPersistenceException( " Could not load roster data into memory");
+        }
+        //holds currently the most recent line
+        String currentLine;
+        Product currentproduct;
+
+        scanner.nextLine();
+        while(scanner.hasNextLine()){
+            currentLine = scanner.nextLine();
+            //unmarshall the line
+            currentproduct = unmarshallProduct(currentLine);
+
+            product.put(currentproduct.getProductType(), currentproduct);
+        }
+        scanner.close();
+    }
+
+    private Product unmarshallProduct(String line){
+        String[] tokens = line.split(DELIMETER);
+
+        String productType = tokens[0];
+        BigDecimal costPerSqft = new BigDecimal(tokens[1]);
+        BigDecimal laborCostPerSqft = new BigDecimal(tokens[2]);
+
+        return new Product(productType, costPerSqft, laborCostPerSqft);
+    }
+
+    //marshal
+    private String marshalProduct(Product product) {
+        // ProductType,CostPerSquareFoot,LaborCostPerSquareFoot
+        return product.getProductType() + DELIMETER
+                + product.getCostPerSqft() + DELIMETER
+                + product.getLaborCostPerSqft();
+    }
+
 }

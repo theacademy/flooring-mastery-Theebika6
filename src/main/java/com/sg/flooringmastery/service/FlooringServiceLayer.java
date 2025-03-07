@@ -19,16 +19,16 @@ public interface FlooringServiceLayer {
     StateTax getStateTax(String stateAbbreviation)
             throws OrderDataValidationException;  // e.g. if the state doesn't exist
 
-    List<StateTax> getStateTaxes();
+    List<StateTax> getStateTaxes() throws FlooringDataPersistenceException;
 
     List<Order> getAllOrders(LocalDate orderDate) throws FlooringDataPersistenceException;
 
     // validates and adds a new order
-    Order addOrder(LocalDate orderDate, int orderNumber);
+    Order addOrder(Order order) throws FlooringDataPersistenceException, OrderDataValidationException;
 
     Order editOrder(Order order) throws OrderDataValidationException;
 
     Order removeOrder(LocalDate orderDate, int orderNumber);
 
-    int getTotalOrderCount();
+    int getNextOrderNumber(LocalDate orderDate) throws FlooringDataPersistenceException;
 }

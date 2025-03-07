@@ -58,7 +58,83 @@ public class FlooringView {
     //display add order
     public Order displayAddOrder(List<Product> products, List<StateTax> stateTaxes){
         displayHeader("Add Order");
-        return null;
+        //prompt order date --> future
+        LocalDate orderDate;
+        do {
+            orderDate = promptOrderDate();
+            if (orderDate.isBefore(LocalDate.now())) {
+                io.print("Order date must be in the future. Try again.");
+            }
+        } while (orderDate.isBefore(LocalDate.now()));
+
+        //prompt for customerName
+        String customerName;
+        while (true) {
+            customerName = io.readString("Enter customer name (letters, numbers, commas, periods allowed): ").trim();
+            if (!customerName.isBlank() && customerName.matches("^[a-zA-Z0-9., ]+$")) {
+                break;
+            }
+            io.print("Invalid name format. Please try again.");
+        }
+        //States --> it will loop and if user enters in lowercase it will change to uppercase to match
+        io.print("Available states:");
+        io.print("Total states loaded " + stateTaxes.size()); //debugging
+        for (StateTax tax : stateTaxes) {
+            io.print(tax.getStateAbbreviation() + " - TaxRate: " + tax.getTaxRate());
+        }
+
+        StateTax selectedState = null;
+        while (selectedState == null) {
+            String stateAbbreviation = io.readString("Enter state abbreviation: ").toUpperCase();
+            for (StateTax tax : stateTaxes) {
+                if (tax.getStateAbbreviation().equals(stateAbbreviation)) {
+                    selectedState = tax;
+                    break;
+                }
+            }
+            if (selectedState == null) {
+                io.print("Invalid state. Please enter a valid state from the list.");
+            }
+        }
+        //products
+        io.print("Available products:");
+        for (Product product : products) {
+            io.print(product.getProductType() + " - Cost per sq ft: " + product.getCostPerSqft() +
+                    ", Labor cost per sq ft: " + product.getLaborCostPerSqft());
+        }
+
+        Product selectedProduct = null;
+        while (selectedProduct == null) {
+            String productType = io.readString("Enter product type: ");
+            for (Product product : products) {
+                if (product.getProductType().equalsIgnoreCase(productType)) {
+                    selectedProduct = product;
+                    break;
+                }
+            }
+            if (selectedProduct == null) {
+                io.print("Invalid product type. Please select from the list.");
+                io.print("Available products again:");
+                for (Product product : products) {
+                    io.print(product.getProductType());
+                }
+            }
+        }
+        //prompt area must be bigger than 100 sqft
+        BigDecimal area;
+        while (true) {
+            try {
+                area = io.readBigDecimal("Enter area (min 100 sq ft): ");
+                if (area.compareTo(BigDecimal.valueOf(100)) >= 0) {
+                    break;
+                }
+                io.print("Invalid area. Must be at least 100 sq ft.");
+            } catch (NumberFormatException e) {
+                io.print("Invalid input. Please enter a numeric value.");
+            }
+        }
+
+        return new Order(0, orderDate, customerName, area, selectedState, selectedProduct);
     }
 
     // display Menu

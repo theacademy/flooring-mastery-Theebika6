@@ -26,7 +26,10 @@ public class StateTax {
     }
 
     public String toString(){
-        return "tbd";
+        return "StateTax: " +
+                " State Abbriviation =" + stateAbbreviation +
+                " State Name = " + stateName +
+                " Tax Rate = " + taxRate ;
     }
 
 

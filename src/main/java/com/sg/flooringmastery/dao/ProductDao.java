@@ -7,6 +7,6 @@ import java.util.List;
 public interface ProductDao {
 
     List<Product> getAllProducts();
-    Product getAllProduct(String productType);
+    Product getProduct(String productType);
 
 }

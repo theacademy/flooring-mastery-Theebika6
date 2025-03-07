@@ -7,14 +7,19 @@ import java.util.List;
 
 public interface OrderDao {
 
-    List<Order> getAllOrders( LocalDate orderDate) throws FlooringDataPersistenceException;
+    //flooringdataexception is used to see if theres any problems to get the order
+    //order not found exception is to see for orderdate and orderNumber
 
-    Order addOrder(Order order) throws FlooringDataPersistenceException;
+    List<Order> getAllOrders(LocalDate date) throws FlooringDataPersistenceException,OrderNotFoundException;
 
-    Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException;
+    Order addOrder(Order order) throws FlooringDataPersistenceException,OrderNotFoundException;
 
-    Order editOrder(Order order) throws FlooringDataPersistenceException;
+    Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException,OrderNotFoundException;
 
-    Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException;
+    // edit order the file must exist
+    Order editOrder(Order order) throws FlooringDataPersistenceException,OrderNotFoundException;
+
+    // remove order
+    Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException,OrderNotFoundException;
 
 }
