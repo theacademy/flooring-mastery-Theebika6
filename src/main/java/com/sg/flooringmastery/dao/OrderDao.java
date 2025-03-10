@@ -4,6 +4,7 @@ import com.sg.flooringmastery.dto.Order;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface OrderDao {
 
@@ -21,5 +22,7 @@ public interface OrderDao {
 
     // remove order
     Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException,OrderNotFoundException;
+
+    Set<LocalDate> getAllOrderDates();
 
 }

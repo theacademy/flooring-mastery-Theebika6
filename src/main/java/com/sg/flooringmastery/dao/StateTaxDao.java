@@ -10,6 +10,4 @@ public interface StateTaxDao {
 
     List<StateTax> getAllStateTaxes() throws FlooringDataPersistenceException;
 
-
-
 }

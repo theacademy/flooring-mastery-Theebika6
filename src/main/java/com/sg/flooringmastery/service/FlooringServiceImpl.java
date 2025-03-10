@@ -8,15 +8,16 @@ import com.sg.flooringmastery.dto.StateTax;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
-public class FlooringServiceImpl implements FlooringServiceLayer{
+public class FlooringServiceImpl implements FlooringServiceLayer {
 
     private final OrderDao orderDao;
     private final ProductDao productDao;
     private final StateTaxDao stateTaxDao;
 
-    public FlooringServiceImpl(OrderDao orderDao, ProductDao productDao, StateTaxDao stateTaxDao){
+    public FlooringServiceImpl(OrderDao orderDao, ProductDao productDao, StateTaxDao stateTaxDao) {
         this.orderDao = orderDao;
         this.productDao = productDao;
         this.stateTaxDao = stateTaxDao;
@@ -93,11 +94,13 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
         // Save Order
         return orderDao.addOrder(order);
     }
+
     private void validateOrderDate(LocalDate orderDate) throws OrderDataValidationException {
         if (orderDate.isBefore(LocalDate.now())) {
             throw new OrderDataValidationException("Error: Order date must be in the future.");
         }
     }
+
     private void validateCustomerName(String name) throws OrderDataValidationException {
         if (name == null || name.trim().isEmpty()) {
             throw new OrderDataValidationException("Error: Customer name cannot be empty.");
@@ -107,16 +110,19 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
             throw new OrderDataValidationException("Error: Customer name contains invalid characters.");
         }
     }
+
     private void validateState(String state) throws OrderDataValidationException, FlooringDataPersistenceException {
         if (stateTaxDao.getStateTax(state) == null) {
             throw new OrderDataValidationException("Error: We do not sell in this state.");
         }
     }
+
     private void validateProduct(String productType) throws OrderDataValidationException {
         if (productDao.getProduct(productType) == null) {
             throw new OrderDataValidationException("Error: Invalid product type.");
         }
     }
+
     private void validateArea(BigDecimal area) throws OrderDataValidationException {
         if (area.compareTo(new BigDecimal("100")) < 0) {
             throw new OrderDataValidationException("Error: Minimum order size is 100 sq ft.");
@@ -130,7 +136,6 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
     }
 
 
-
     @Override
     public Order editOrder(Order order) throws FlooringDataPersistenceException, OrderDataValidationException {
         validateCustomerName(order.getCustomerName());
@@ -141,17 +146,22 @@ public class FlooringServiceImpl implements FlooringServiceLayer{
         return orderDao.editOrder(order);
     }
 
+
     @Override
     public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException {
-        return null;
-    }
-}
-
-   /* @Override
-    public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException{
+        // Check if the order exists
         Order orderToRemove = orderDao.getOrder(orderDate, orderNumber);
-        if(orderToRemove == null){
-            throw new OrderDataValidationException("Error: Order cannot be found!");
+        if (orderToRemove == null) {
+            throw new OrderNotFoundException("Error: Order not found!");
+        }
+
+        // Remove the order from the DAO
+        return orderDao.removeOrder(orderDate, orderNumber);
     }
-    return orderDao.removeOrder(orderDate, orderNumber);*/
-//}
+
+    @Override
+    public Set<LocalDate> getAllOrderDates() throws FlooringDataPersistenceException{
+        return orderDao.getAllOrderDates();
+    }
+
+}

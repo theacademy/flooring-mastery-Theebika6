@@ -3,11 +3,9 @@ package com.sg.flooringmastery.dao;
 import com.sg.flooringmastery.dto.Order;
 import com.sg.flooringmastery.dto.Product;
 import com.sg.flooringmastery.dto.StateTax;
-import com.sg.flooringmastery.service.OrderDataValidationException;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -87,11 +85,11 @@ public class OrderDaoFileImpl implements OrderDao {
 
     @Override
     public Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException {
-        read(orderDate); // Load orders
+        read(orderDate); // Load orders from file
 
         List<Order> ordersForDate = orders.get(orderDate);
         if (ordersForDate == null || ordersForDate.isEmpty()) {
-            throw new OrderDataValidationException("Error: No orders exist for this date.");
+            throw new OrderNotFoundException("Error: No orders exist for this date.");
         }
 
         Order removedOrder = null;
@@ -106,20 +104,14 @@ public class OrderDaoFileImpl implements OrderDao {
         }
 
         if (removedOrder == null) {
-            throw new OrderDataValidationException("Error: Order number " + orderNumber + " not found.");
+            throw new OrderNotFoundException("Error: Order number " + orderNumber + " not found.");
         }
 
-        // Update the file (remove or overwrite)
+        // Update file: delete if no orders left, else rewrite
         if (ordersForDate.isEmpty()) {
-            // If all orders are removed, delete the file
             String fileName = ORDER_FOLDER + orderDate.format(DateTimeFormatter.ofPattern("MMddyyyy")) + ".txt";
-            File file = new File(fileName);
-            if(file.exists()){
-                file.delete();
-            }
-            orders.remove(orderDate);
+            new File(fileName).delete();
         } else {
-            // Otherwise, rewrite the file
             writeOrdersToFile(orderDate, ordersForDate);
         }
 
@@ -205,6 +197,11 @@ public class OrderDaoFileImpl implements OrderDao {
         orderAsText += order.getTax() + DELIMITER;
         orderAsText += order.getTotal();
         return orderAsText;
+    }
+
+    @Override
+    public Set<LocalDate> getAllOrderDates() {
+        return orders.keySet();
     }
 
 }

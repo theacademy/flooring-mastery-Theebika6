@@ -14,7 +14,7 @@ public class UserIOConsoleImpl implements UserIO{
 
     @Override
     public boolean readBoolean(String prompt) {
-        print(prompt + "(true/false : ");
+        print(prompt + "(yes/no) : ");
         String input = sc.nextLine().trim().toLowerCase();
         return input.equals("true") || input.equals("yes") || input.equals("y");
     }

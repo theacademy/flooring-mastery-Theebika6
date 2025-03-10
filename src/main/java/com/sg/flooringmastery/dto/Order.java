@@ -3,7 +3,6 @@ package com.sg.flooringmastery.dto;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Objects;
 
 public class Order {
 
@@ -18,6 +17,7 @@ public class Order {
         orderNumber = -1;
     }
 
+    // constructor
     public Order(int orderNumber, LocalDate orderDate, String customerName, BigDecimal area, StateTax stateTax, Product product){
         this.orderNumber = orderNumber;
         this.orderDate = orderDate;
@@ -118,22 +118,18 @@ public class Order {
                 ", total = " + getTotal() ;
     }
 
-    // equals
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Order)) return false;
-        Order order = (Order) o;
-        return orderNumber == order.orderNumber &&
-                Objects.equals(orderDate, order.orderDate) &&
-                Objects.equals(customerName, order.customerName) &&
-                Objects.equals(area, order.area) &&
-                Objects.equals(stateTax, order.stateTax) &&
-                Objects.equals(product, order.product);
-    }
+    // equals code removed since it wasn't implemented
+
     //clone order
-    //public Order cloneOrder(){
-      //  return new Order()
-    //}
+    public Order cloneOrder(){
+      Order cloneOrder = new Order();
+      cloneOrder.setOrderNumber(this.orderNumber);
+      cloneOrder.setOrderDate(this.orderDate);
+      cloneOrder.setCustomerName(this.customerName);
+      cloneOrder.setArea(this.area);
+      cloneOrder.setStateTax(this.stateTax);
+      cloneOrder.setProduct(this.product);
+      return cloneOrder;
+    }
 
 }

@@ -8,9 +8,9 @@ import com.sg.flooringmastery.service.FlooringServiceLayer;
 import com.sg.flooringmastery.service.OrderDataValidationException;
 import com.sg.flooringmastery.ui.FlooringView;
 import com.sg.flooringmastery.ui.MenuSelection;
-import com.sg.flooringmastery.ui.UserIO;
-import com.sg.flooringmastery.ui.UserIOConsoleImpl;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class FlooringController {
     public void run() {
         boolean keepGoing = true;
         while (keepGoing) {
-            // 1) Get user choice
+            // Get user choice
             MenuSelection selection = promptMenuSelection();
             switch (selection) {
                 case DISPLAY_ORDER:
@@ -43,16 +43,22 @@ public class FlooringController {
                     removeOrder();
                     break;
                 case EXPORT_ALL_DATA:
-                  //  exportAllData();
+                    exportAllData();
                     break;
                 case EXIT:
-                    keepGoing = false;
+                    // ask confirmation to exit
+                    boolean confirmToExit = view.readBoolean("Are you sure you want to exit? (yes/no) ");
+                    if (confirmToExit){
+                        keepGoing = false;
+                    }
+
                     break;
                 default:
                     System.out.println("Unknown command.");
             }
         }
         System.out.println("Exiting Flooring Program. Goodbye!");
+        view.displayPressEnterToContinue();
     }
 
 
@@ -94,6 +100,15 @@ public class FlooringController {
             int orderNumber = service.getNextOrderNumber(newOrder.getOrderDate());
             newOrder.setOrderNumber(orderNumber);
 
+            // order summary before confirmation
+            view.displayHeader("Order Summary: ");
+            System.out.println(newOrder);
+            //ask user to confirm
+            boolean confirm = view.readBoolean(" Do you want to place this order? (yes/no) ");
+            if(!confirm){
+                view.displayHeader("Order not added");
+                return;
+            }
             //Add order
             Order addedOrder = service.addOrder(newOrder);
             view.displayHeader("Order added successfully!");
@@ -109,21 +124,31 @@ public class FlooringController {
     private void editOrder() {
         System.out.println("EDIT ORDER");
 
+        // get order details
         LocalDate orderDate = view.promptOrderDate();
-        int orderNumber = view.promptOrderNumber();
-
         try {
+            // Check if orders exist for this date
+            List<Order> ordersForDate = service.getAllOrders(orderDate);
+            if (ordersForDate.isEmpty()) {
+                view.displayHeader("Error: No orders found for " + orderDate);
+                return;
+            }
+
+            // asks user for order number
+            int orderNumber = view.promptOrderNumber();
+
+            // gets existing order from the service layer
             Order existingOrder = service.getOrder(orderDate, orderNumber);
             if (existingOrder == null) {
                 view.displayHeader("Error: Order not found.");
                 return;
             }
-
+            // user edits the order
             Order updatedOrder = view.displayEditOrder(service.getProducts(), service.getStateTaxes(), existingOrder);
             if(updatedOrder == null){
                 return ;
             }
-
+            // validate and saves the order
             service.editOrder(updatedOrder);
             view.displayHeader("Order updated successfully!");
 
@@ -137,49 +162,69 @@ public class FlooringController {
     private void removeOrder() {
         view.displayRemoveOrderBanner();
 
+        // Prompt for order date
         LocalDate orderDate = view.promptOrderDate();
+        // check if order date exists in correct format
         int orderNumber = view.promptOrderNumber();
 
         try {
+            // Fetch the existing order from the service layer
+            Order existingOrder = service.getOrder(orderDate, orderNumber);
+            if (existingOrder == null) {
+                view.displayHeader("Error: Order not found for " + orderDate + " and order number " + orderNumber);
+                return;
+            }
+
+            // Display order details before removal
+            view.displayOrders(List.of(existingOrder));
+
+            // Ask for confirmation
+            boolean confirm = view.readBoolean("Are you sure you want to remove this order? (yes/no)");
+            if (!confirm) {
+                view.displayHeader("Order removal canceled.");
+                return;
+            }
+
+            // Remove the order
             Order removedOrder = service.removeOrder(orderDate, orderNumber);
             view.displayRemoveResult(removedOrder);
+
         } catch (FlooringDataPersistenceException | OrderDataValidationException e) {
             view.displayHeader("Error: " + e.getMessage());
         }
 
         view.displayPressEnterToContinue();
     }
-   /* private void removeOrder() {
-        view.displayRemoveOrderBanner();
 
-        LocalDate orderDate = view.promptOrderDate();
-        int orderNumber = view.promptOrderNumber();
+    public void exportAllData() {
+        String exportFilePath = "Orders/ExportOrders.txt";
 
-        try {
-            Order existingOrder = service.getOrder(orderDate, orderNumber);
-            if (existingOrder == null) {
-                view.displayHeader("Error: Order not found.");
-                return;
+        try (PrintWriter writer = new PrintWriter(new FileWriter(exportFilePath))) {
+            writer.println("OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total");
+
+            int orderCount = 0;
+
+            // Get all order dates first
+            for (LocalDate date : service.getAllOrderDates()) {
+                List<Order> orders = service.getAllOrders(date);
+                for (Order o : orders) {
+                    writer.println(date + "-" + o.getOrderNumber() + "," + o.getCustomerName() + "," +
+                            o.getStateTax().getStateAbbreviation() + "," + o.getStateTax().getTaxRate() + "," +
+                            o.getProduct().getProductType() + "," + o.getArea() + "," +
+                            o.getProduct().getCostPerSqft() + "," + o.getProduct().getLaborCostPerSqft() + "," +
+                            o.getMaterialCost() + "," + o.getLaborCost() + "," +
+                            o.getTax() + "," + o.getTotal());
+                    orderCount++;
+                }
             }
 
-            // Display order details before deletion
-            view.displayOrders(List.of(existingOrder));
+            //  Display confirmation message
+            view.displayExportAllData(orderCount, exportFilePath);
 
-            boolean confirm = view.io.readBoolean("Are you sure you want to remove this order? (yes/no)");
-            if (!confirm) {
-                view.displayHeader("Order removal canceled.");
-                return;
-            }
-
-            Order removedOrder = service.removeOrder(orderDate, orderNumber);
-            view.displayRemoveResult(removedOrder);
-
-        } catch (FlooringDataPersistenceException | OrderDataValidationException e) {
-            view.displayHeader("Error: " + e.getMessage());
+        } catch (Exception e) {
+            view.displayHeader("Error exporting data: " + e.getMessage());
         }
-
         view.displayPressEnterToContinue();
-    } */
-
+    }
 
 }

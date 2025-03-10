@@ -36,7 +36,6 @@ public class ProductDaoFileImpl implements ProductDao{
 
     public void loadProduct() throws FlooringDataPersistenceException{
         Scanner scanner;
-
         try{
             scanner = new Scanner(new BufferedReader(new FileReader(PRODUCT_FILE)));
         } catch (FileNotFoundException e){

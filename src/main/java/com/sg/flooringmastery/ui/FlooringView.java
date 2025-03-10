@@ -8,9 +8,7 @@ import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 
 public class FlooringView {
 
@@ -21,6 +19,23 @@ public class FlooringView {
         this.io = io;
     }
 
+    // display Menu
+    public MenuSelection printMenuAndGet() {
+        io.print("***************************************");
+        io.print("* <<Flooring Program>>");
+        io.print("* 1. Display Orders");
+        io.print("* 2. Add an Order");
+        io.print("* 3. Edit an Order");
+        io.print("* 4. Remove an Order");
+        io.print("* 5. Export All Data");
+        io.print("* 6. Exit");
+        io.print("***************************************");
+
+
+        int choice= io.readInt("Please select from the above choices: ", 1, 6);
+        return MenuSelection.fromInt(choice);
+    }
+
     // displayHeader
     public void displayHeader(String title){
         io.print("===" + title + "===");
@@ -29,6 +44,8 @@ public class FlooringView {
     //display press enter
     public void displayPressEnterToContinue(){
         io.print("Press Enter to continue.");
+        io.readString(" ");
+
     }
 
     // ask for order date
@@ -55,6 +72,12 @@ public class FlooringView {
         return io.readBigDecimal("Enter a decimal value: ");
     }
 
+    public void displayOrders(List<Order> orders) {
+        for (Order o : orders) {
+
+            System.out.println(o);
+        }
+    }
     //display add order
     public Order displayAddOrder(List<Product> products, List<StateTax> stateTaxes){
         displayHeader("Add Order");
@@ -142,51 +165,79 @@ public class FlooringView {
     public Order displayEditOrder(List<Product> products, List<StateTax> stateTaxes, Order existingOrder){
         displayHeader("Edit Order");
 
-        //editing name
-        String newCustomerName = io.readString("Enter new customer name (" + existingOrder.getCustomerName() + ")");
-        if(!newCustomerName.trim().isEmpty()){
-            existingOrder.setCustomerName(newCustomerName);
+        // clone order before modifying
+        Order editOrder = existingOrder.cloneOrder();
+
+        // edit customer name
+        String newCustomerName = io.readString("Enter new customer name (" + editOrder.getCustomerName() + ")");
+        if(!newCustomerName.trim().isEmpty() && newCustomerName.matches("^[a-zA-Z0-9., ]+$")){
+            editOrder.setCustomerName(newCustomerName);
         }
         //editing state
-        // Allow editing of state
-        io.print("Available states:");
-        for (StateTax tax : stateTaxes) {
-            io.print(tax.getStateAbbreviation() + " - TaxRate: " + tax.getTaxRate());
-        }
-        String newState = io.readString("Enter new state (" + existingOrder.getStateTax().getStateAbbreviation() + ") or press Enter to keep: ");
-        if (!newState.trim().isEmpty()) {
-            for(StateTax tax : stateTaxes){
-                if(tax.getStateAbbreviation().equalsIgnoreCase(newState) || tax.getStateName().equalsIgnoreCase(newState)){
-                    existingOrder.setStateTax(tax);
+        StateTax selectedState= editOrder.getStateTax();
+        while(true){
+            String newState = io.readString("Enter new State (" + selectedState.getStateAbbreviation() + ") or press to Enter to keep: " ).trim();
+
+            if (newState.isEmpty()) break;
+
+            boolean isValidState = false;
+            for (StateTax tax : stateTaxes) {
+                if (tax.getStateAbbreviation().equalsIgnoreCase(newState)) {
+                    selectedState = tax;
+                    isValidState = true;
                     break;
                 }
             }
+            if (isValidState) {
+                editOrder.setStateTax(selectedState);
+                break;
+            } else {
+                io.print("Error: Invalid state. Please enter a valid state.");
+            }
         }
 
-        // editing product type
+        // Editing product type
         io.print("Available products:");
         for (Product product : products) {
             io.print(product.getProductType() + " - Cost per sq ft: " + product.getCostPerSqft() +
                     ", Labor cost per sq ft: " + product.getLaborCostPerSqft());
         }
-        String newProductType = io.readString("Enter new product type (" + existingOrder.getProduct().getProductType() + ") or press Enter to keep: ");
-        if (!newProductType.trim().isEmpty()) {
+
+        Product selectedProduct = editOrder.getProduct();
+        while (true) {
+            String newProductType = io.readString("Enter new product type (" + selectedProduct.getProductType() + ") or press Enter to keep: ").trim();
+            if (newProductType.isEmpty()) break;
+
+            boolean isValidProduct = false;
             for (Product product : products) {
                 if (product.getProductType().equalsIgnoreCase(newProductType)) {
-                    existingOrder.setProduct(product);
+                    selectedProduct = product;
+                    isValidProduct = true;
                     break;
                 }
+            }
+            if (isValidProduct) {
+                editOrder.setProduct(selectedProduct);
+                break;
+            } else {
+                io.print("Error: Invalid product type. Please select from the list.");
             }
         }
 
         // editing area
-        String newAreaInput = io.readString("Enter new area (" + existingOrder.getArea() + ") or press Enter to keep: ");
-        if (!newAreaInput.trim().isEmpty()) {
-            BigDecimal newArea = new BigDecimal(newAreaInput);
-            if (newArea.compareTo(BigDecimal.valueOf(100)) >= 0) {
-                existingOrder.setArea(newArea);
-            } else {
-                io.print("Invalid area. Must be at least 100 sq ft.");
+        while (true) {
+            String newAreaInput = io.readString("Enter new area (" + editOrder.getArea() + ") or press Enter to keep: ").trim();
+            if (newAreaInput.isEmpty()) break;
+            try {
+                BigDecimal newArea = new BigDecimal(newAreaInput);
+                if (newArea.compareTo(BigDecimal.valueOf(100)) >= 0) {
+                    editOrder.setArea(newArea);
+                    break;
+                } else {
+                    io.print("Error: Area must be at least 100 sq ft.");
+                }
+            } catch (NumberFormatException e) {
+                io.print("Error: Invalid input.");
             }
         }
 
@@ -196,9 +247,9 @@ public class FlooringView {
             io.print("Editing failed.");
             return null;
         }
-
-        return existingOrder;
+        return editOrder;
     }
+
    // remove order
    public void displayRemoveOrderBanner() {
        io.print("=== Remove Order ===");
@@ -213,42 +264,14 @@ public class FlooringView {
         io.readString("Please hit enter to continue.");
     }
 
-
-    // display Menu
-    public MenuSelection printMenuAndGet() {
-        io.print("***************************************");
-        io.print("* <<Flooring Program>>");
-        io.print("* 1. Display Orders");
-        io.print("* 2. Add an Order");
-        io.print("* 3. Edit an Order");
-        io.print("* 4. Remove an Order");
-        io.print("* 5. Export All Data");
-        io.print("* 6. Exit");
-        io.print("***************************************");
-
-
-        int choice= io.readInt("Please select from the above choices: ", 1, 6);
-        return MenuSelection.fromInt(choice);
+    public void displayExportAllData(int numOfOrders, String filePath) {
+        io.print("=== Export All Data ===");
+        io.print(numOfOrders + " orders exported successfully to: " + filePath);
     }
 
-    public String displayExportAllData(){
-        displayHeader("Export All Data");
-        // ask user to confirm
-        boolean confirm = io.readBoolean("Are you sure you want to export all the data?");
-        if(confirm){
-            return "All data are exported sucessfully";
-        }else{
-            return "Export failed";
-        }
+    public boolean readBoolean(String prompt) {
+        return io.readBoolean(prompt);
     }
-
-    public void displayOrders(List<Order> orders) {
-        for (Order o : orders) {
-
-            System.out.println(o);
-        }
-    }
-
 
 
 }

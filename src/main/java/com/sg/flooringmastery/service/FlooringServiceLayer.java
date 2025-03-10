@@ -8,7 +8,7 @@ import com.sg.flooringmastery.dto.StateTax;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 
 public interface FlooringServiceLayer {
 
@@ -34,4 +34,7 @@ public interface FlooringServiceLayer {
     Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException, OrderNotFoundException;
 
     int getNextOrderNumber(LocalDate orderDate) throws FlooringDataPersistenceException, OrderNotFoundException;
+
+    Set<LocalDate> getAllOrderDates()  throws FlooringDataPersistenceException;
+
 }
