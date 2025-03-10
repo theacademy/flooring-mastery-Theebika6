@@ -29,16 +29,8 @@ public class Product {
         return laborCostPerSqft;
     }
 
-    //to String method
-    @Override
-    public String toString(){
-        return "Product: " +
-                " productType =" + productType +
-                " costPerSqft = " + costPerSqft +
-                " laborCostPerSqft = " + laborCostPerSqft ;
-    }
-
-    //equals method?
+    //to String method wasnt implemented
+    //equal method
 
 
 }

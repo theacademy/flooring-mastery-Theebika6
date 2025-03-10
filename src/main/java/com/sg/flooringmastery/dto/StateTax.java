@@ -30,12 +30,7 @@ public class StateTax {
         return taxRate;
     }
 
-    public String toString(){
-        return "StateTax: " +
-                " State Abbriviation =" + stateAbbreviation +
-                " State Name = " + stateName +
-                " Tax Rate = " + taxRate ;
-    }
+   //to string removed, didnt implement
 
 
 

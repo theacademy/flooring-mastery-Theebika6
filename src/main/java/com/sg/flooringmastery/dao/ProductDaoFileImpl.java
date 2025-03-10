@@ -66,12 +66,5 @@ public class ProductDaoFileImpl implements ProductDao{
         return new Product(productType, costPerSqft, laborCostPerSqft);
     }
 
-    //marshal
-    private String marshalProduct(Product product) {
-        // ProductType,CostPerSquareFoot,LaborCostPerSquareFoot
-        return product.getProductType() + DELIMETER
-                + product.getCostPerSqft() + DELIMETER
-                + product.getLaborCostPerSqft();
-    }
-
+    // removed marshall code since it was not implemented
 }

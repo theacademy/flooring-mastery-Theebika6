@@ -23,7 +23,39 @@ public class OrderDaoFileImpl implements OrderDao {
         return orders.getOrDefault(orderDate, new ArrayList<>());
     }
 
+    @Override
+    public Set<LocalDate> getAllOrderDates() {
+        return orders.keySet();
+    }
 
+    /*@Override
+    public Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException {
+        read(orderDate);
+        List<Order> ordersForDate = orders.get(orderDate);
+
+        if (ordersForDate != null) {
+            for (Order order : ordersForDate) {
+                if (order.getOrderNumber() == orderNumber) {
+                    return order;
+                }
+            }
+        }
+        return null;
+    }*/
+
+    // Refactor the code using stream
+    @Override
+    public Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException {
+        read(orderDate);
+        // if the date has orders, it returns the list and converts to stream
+        return orders.getOrDefault(orderDate, new ArrayList<>()).stream()
+                //filter orders by order number
+                .filter(order -> order.getOrderNumber() == orderNumber)
+                .findFirst()
+                .orElse(null);
+    }
+
+    // add order
     @Override
     public Order addOrder(Order order) throws FlooringDataPersistenceException, OrderNotFoundException {
         LocalDate orderDate = order.getOrderDate();
@@ -39,21 +71,6 @@ public class OrderDaoFileImpl implements OrderDao {
 
         writeOrdersToFile(orderDate, orders.get(orderDate)); // Save changes
         return order;
-    }
-
-    @Override
-    public Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException {
-        read(orderDate);
-        List<Order> ordersForDate = orders.get(orderDate);
-
-        if (ordersForDate != null) {
-            for (Order order : ordersForDate) {
-                if (order.getOrderNumber() == orderNumber) {
-                    return order;
-                }
-            }
-        }
-        return null;
     }
 
     @Override
@@ -197,11 +214,6 @@ public class OrderDaoFileImpl implements OrderDao {
         orderAsText += order.getTax() + DELIMITER;
         orderAsText += order.getTotal();
         return orderAsText;
-    }
-
-    @Override
-    public Set<LocalDate> getAllOrderDates() {
-        return orders.keySet();
     }
 
 }

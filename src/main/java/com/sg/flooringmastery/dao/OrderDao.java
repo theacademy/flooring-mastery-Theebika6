@@ -13,6 +13,8 @@ public interface OrderDao {
 
     List<Order> getAllOrders(LocalDate date) throws FlooringDataPersistenceException,OrderNotFoundException;
 
+    Set<LocalDate> getAllOrderDates();
+
     Order addOrder(Order order) throws FlooringDataPersistenceException,OrderNotFoundException;
 
     Order getOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException,OrderNotFoundException;
@@ -23,6 +25,5 @@ public interface OrderDao {
     // remove order
     Order removeOrder(LocalDate orderDate, int orderNumber) throws FlooringDataPersistenceException,OrderNotFoundException;
 
-    Set<LocalDate> getAllOrderDates();
 
 }

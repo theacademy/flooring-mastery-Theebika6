@@ -77,9 +77,7 @@ public class FlooringController {
         }catch (FlooringDataPersistenceException e){
             view.displayHeader("Error " + e.getMessage());
         }
-
         view.displayPressEnterToContinue();
-
     }
 
     private void addOrder() {
